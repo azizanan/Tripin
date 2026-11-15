@@ -65,7 +65,10 @@ export default function DestinationDetailPage() {
     try {
       await api.post("/reviews", { destination_id: Number(id), rating, comment });
       setComment("");
-      await loadReviews();
+      await Promise.all([
+        loadReviews(),
+        api.get(`/destinations/${id}`).then((response) => setDestination(response.data.data))
+      ]);
       toast.success("Ulasan berhasil dikirim.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Ulasan gagal dikirim.");
