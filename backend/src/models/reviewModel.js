@@ -1,5 +1,13 @@
 import pool from "../config/database.js";
 
+export async function isPublishedDestination(destinationId) {
+  const [rows] = await pool.execute(
+    "SELECT id FROM destinations WHERE id = ? AND is_published = TRUE LIMIT 1",
+    [destinationId]
+  );
+  return rows.length > 0;
+}
+
 export async function listReviews(destinationId) {
   const [rows] = await pool.execute(
     `SELECT r.id, r.user_id, r.destination_id, r.rating, r.comment, r.created_at,
