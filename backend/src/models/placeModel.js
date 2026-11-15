@@ -1,7 +1,7 @@
 import pool from "../config/database.js";
 
 export async function getPlaces({ search = "", category = "", limit = 12, offset = 0 } = {}) {
-  const conditions = [];
+  const conditions = ["p.is_published = TRUE"];
   const values = [];
 
   if (search) {
@@ -15,7 +15,7 @@ export async function getPlaces({ search = "", category = "", limit = 12, offset
     values.push(category);
   }
 
-  const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const whereClause = `WHERE ${conditions.join(" AND ")}`;
 
   const [rows] = await pool.execute(
     `SELECT
@@ -57,7 +57,7 @@ export async function getPlaceById(id) {
        c.slug AS category_slug
      FROM places p
      LEFT JOIN categories c ON c.id = p.category_id
-     WHERE p.id = ?
+     WHERE p.id = ? AND p.is_published = TRUE
      LIMIT 1`,
     [id]
   );
