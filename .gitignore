@@ -11,6 +11,10 @@ dist/
 build/
 coverage/
 
+# Runtime uploads (keep directory placeholder)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 # Logs
 *.log
 npm-debug.log*
