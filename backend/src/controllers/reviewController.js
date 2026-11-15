@@ -1,6 +1,6 @@
 import {
   createReview, deleteReview, getReviewById, getReviewOwner,
-  listReviews, listReviewsByUser, updateReview
+  isPublishedDestination, listReviews, listReviewsByUser, updateReview
 } from "../models/reviewModel.js";
 import { isPositiveInteger } from "../utils/validation.js";
 
@@ -8,6 +8,7 @@ export async function index(req, res, next) {
   try {
     const destinationId = Number(req.params.destinationId);
     if (!isPositiveInteger(destinationId)) return res.status(400).json({ success: false, message: "ID destinasi tidak valid." });
+    if (!await isPublishedDestination(destinationId)) return res.status(404).json({ success: false, message: "Destinasi tidak ditemukan." });
     return res.json({ success: true, data: await listReviews(destinationId) });
   } catch (error) { return next(error); }
 }
@@ -26,6 +27,7 @@ export async function store(req, res, next) {
     if (!isPositiveInteger(destinationId) || !Number.isInteger(rating) || rating < 1 || rating > 5 || comment.length < 3 || comment.length > 2000) {
       return res.status(400).json({ success: false, message: "Destinasi, rating 1–5, dan ulasan 3–2000 karakter wajib diisi." });
     }
+    if (!await isPublishedDestination(destinationId)) return res.status(404).json({ success: false, message: "Destinasi tidak ditemukan." });
     const review = await createReview({ userId: req.user.id, destinationId, rating, comment });
     return res.status(201).json({ success: true, message: "Ulasan berhasil ditambahkan.", data: review });
   } catch (error) { return next(error); }
