@@ -13,6 +13,19 @@ export async function listReviews(destinationId) {
   return rows;
 }
 
+export async function listReviewsByUser(userId) {
+  const [rows] = await pool.execute(
+    `SELECT r.id, r.user_id, r.destination_id, r.rating, r.comment, r.created_at,
+       d.name AS destination_name, d.image AS destination_image
+     FROM reviews r
+     INNER JOIN destinations d ON d.id = r.destination_id
+     WHERE r.user_id = ?
+     ORDER BY r.created_at DESC`,
+    [userId]
+  );
+  return rows;
+}
+
 export async function createReview({ userId, destinationId, rating, comment }) {
   const [result] = await pool.execute(
     "INSERT INTO reviews (user_id, destination_id, rating, comment) VALUES (?, ?, ?, ?)",
