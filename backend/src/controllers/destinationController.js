@@ -12,8 +12,9 @@ function parseDestination(body) {
   const latitude = toNullableNumber(body.latitude);
   const longitude = toNullableNumber(body.longitude);
 
-  if (name.length < 2 || name.length > 160 || !isPositiveInteger(categoryId)) {
-    return { error: "Nama tempat dan kategori yang valid wajib diisi." };
+  const slug = slugify(body.slug || name);
+  if (name.length < 2 || name.length > 160 || !isPositiveInteger(categoryId) || !slug) {
+    return { error: "Nama tempat, slug, dan kategori yang valid wajib diisi." };
   }
   if (priceMin !== null && (!Number.isFinite(priceMin) || priceMin < 0)) return { error: "Harga minimum tidak valid." };
   if (priceMax !== null && (!Number.isFinite(priceMax) || priceMax < 0)) return { error: "Harga maksimum tidak valid." };
@@ -25,7 +26,7 @@ function parseDestination(body) {
     data: {
       categoryId,
       name,
-      slug: slugify(body.slug || name),
+      slug,
       description: String(body.description || "").trim(),
       address: String(body.address || "").trim(),
       district: String(body.district || "").trim(),
