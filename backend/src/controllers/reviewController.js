@@ -1,5 +1,6 @@
 import {
-  createReview, deleteReview, getReviewById, getReviewOwner, listReviews, updateReview
+  createReview, deleteReview, getReviewById, getReviewOwner,
+  listReviews, listReviewsByUser, updateReview
 } from "../models/reviewModel.js";
 import { isPositiveInteger } from "../utils/validation.js";
 
@@ -8,6 +9,12 @@ export async function index(req, res, next) {
     const destinationId = Number(req.params.destinationId);
     if (!isPositiveInteger(destinationId)) return res.status(400).json({ success: false, message: "ID destinasi tidak valid." });
     return res.json({ success: true, data: await listReviews(destinationId) });
+  } catch (error) { return next(error); }
+}
+
+export async function mine(req, res, next) {
+  try {
+    return res.json({ success: true, data: await listReviewsByUser(req.user.id) });
   } catch (error) { return next(error); }
 }
 
