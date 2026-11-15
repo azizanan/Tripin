@@ -1,4 +1,4 @@
-import { Filter, Search, SlidersHorizontal, X } from "lucide-react";
+import { Filter, Search, SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -26,14 +26,14 @@ export default function ExplorePage() {
     api.get("/categories").then((r) => setCategories(r.data.data || [])).catch(() => toast.error("Kategori gagal dimuat."));
   }, []);
 
-  const load = async (page = 1) => {
+  const load = async (page = 1, selectedFilters = filters) => {
     setLoading(true);
     try {
-      const params = { page, limit: 9, ...Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== "")) };
+      const params = { page, limit: 9, ...Object.fromEntries(Object.entries(selectedFilters).filter(([, value]) => value !== "")) };
       const response = await api.get("/destinations", { params });
       setItems(response.data.data || []);
       setPagination(response.data.pagination || { page: 1, totalPages: 1, total: 0 });
-      setSearchParams(filters.search ? { search: filters.search } : {}, { replace: true });
+      setSearchParams(selectedFilters.search ? { search: selectedFilters.search } : {}, { replace: true });
     } catch {
       toast.error("Destinasi gagal dimuat. Periksa koneksi API.");
       setItems([]);
@@ -43,11 +43,11 @@ export default function ExplorePage() {
   useEffect(() => { load(1); }, []);
 
   const change = (key, value) => setFilters((current) => ({ ...current, [key]: value }));
-  const apply = (event) => { event.preventDefault(); load(1); };
+  const apply = (event) => { event.preventDefault(); load(1, filters); };
   const reset = () => {
     const cleared = { search: "", category_id: "", district: "", min_price: "", max_price: "", sort: "newest" };
     setFilters(cleared);
-    setTimeout(() => load(1), 0);
+    load(1, cleared);
   };
 
   return (
