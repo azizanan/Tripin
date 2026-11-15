@@ -1,11 +1,11 @@
 # TRIPIN Backend
 
-REST API TRIPIN menggunakan **Node.js + Express** dan **MySQL** melalui package `mysql2`.
+Backend TRIPIN menggunakan Node.js, Express, MySQL (mysql2), JWT, dan bcrypt. Role pengguna adalah `user` dan `admin`.
 
 ## Persyaratan
-- Node.js versi LTS
+- Node.js 20 LTS atau lebih baru
 - npm
-- MySQL Server
+- MySQL 8.0+
 
 ## Instalasi
 ```bash
@@ -13,58 +13,57 @@ cd backend
 npm install
 ```
 
-Buat file konfigurasi lokal dengan menyalin `.env.example` menjadi `.env`, lalu sesuaikan kredensial MySQL.
+Salin `.env.example` menjadi `.env`, kemudian isi kredensial MySQL dan JWT secret acak minimal 32 karakter. Jangan commit file `.env`.
 
-## Siapkan database
-Jalankan schema SQL dari root repository:
+## Siapkan database baru
+Dari root repository:
 
 ```bash
 mysql -u root -p < backend/database/schema.sql
+mysql -u root -p tripin_db < backend/database/seeds/initial_data.sql
 ```
 
-Atau buka `backend/database/schema.sql` melalui MySQL Workbench dan jalankan script tersebut.
+Contoh tempat pada seed sengaja disimpan sebagai draft. Lengkapi dan verifikasi alamat, harga, jam operasional, koordinat, dan foto sebelum admin memublikasikannya.
 
-## Menjalankan API
+## Buat akun admin pertama
+Isi `ADMIN_NAME`, `ADMIN_EMAIL`, dan `ADMIN_PASSWORD` (minimal 12 karakter) pada `.env`, lalu jalankan:
+
+```bash
+npm run create-admin
+```
+
+## Jalankan API
 ```bash
 npm run dev
 ```
 
-Server berjalan di http://localhost:5000.
+API tersedia pada `http://localhost:5000`.
 
-## Endpoint awal
-| Method | Endpoint | Keterangan |
+## Endpoint
+| Method | Endpoint | Akses |
 |---|---|---|
-| GET | `/` | Informasi API |
-| GET | `/api/health` | Memeriksa API dan koneksi MySQL |
-| GET | `/api/places` | Daftar tempat yang sudah dipublikasikan |
-| GET | `/api/places/:id` | Detail tempat berdasarkan ID |
+| GET | `/api/health` | Publik |
+| POST | `/api/auth/register` | Publik |
+| POST | `/api/auth/login` | Publik |
+| GET / PUT | `/api/auth/profile` | Login |
+| GET | `/api/destinations` | Publik |
+| GET | `/api/destinations/:id` | Publik |
+| POST / PUT / DELETE | `/api/destinations/:id` | Admin |
+| GET | `/api/categories` | Publik |
+| GET | `/api/categories/:id/destinations` | Publik |
+| POST / PUT / DELETE | `/api/categories/:id` | Admin |
+| GET | `/api/reviews/:destinationId` | Publik |
+| POST / PUT / DELETE | `/api/reviews` | Login (admin dapat moderasi) |
+| GET / POST / DELETE | `/api/favorites` | Login |
+| GET | `/api/admin/stats` | Admin |
 
-### Filter daftar tempat
-- `GET /api/places?search=tugu`
-- `GET /api/places?category=wisata`
-- `GET /api/places?page=1&limit=12`
+Parameter daftar destinasi: `search`, `category_id`, `district`, `min_price`, `max_price`, `sort` (`newest`, `rating`, `popular`, `name`), `page`, dan `limit`.
 
-Data tempat hanya ditampilkan apabila `is_published = TRUE`.
+Rating adalah rata-rata dari ulasan pengguna. Setiap pengguna hanya dapat memberi satu ulasan per destinasi. Pendaftaran publik hanya menghasilkan role `user`.
 
-## Struktur backend
-```
-backend/
-├── database/
-│   ├── migrations/
-│   ├── seeds/
-│   └── schema.sql
-├── src/
-│   ├── config/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   └── app.js
-├── .env.example
-├── package.json
-└── server.js
-```
-
-## Keamanan
-- Jangan commit file `.env`.
-- Gunakan `.env.example` untuk berbagi nama variabel konfigurasi tanpa nilai rahasia.
-- Endpoint publik hanya menampilkan tempat yang telah dipublikasikan.
+## Keamanan dan batasan MVP
+- Endpoint CRUD destinasi/kategori dan statistik admin dilindungi role admin.
+- Password disimpan dengan bcrypt; token diverifikasi melalui JWT.
+- API memakai Helmet, CORS allowlist, dan rate limit login/register.
+- Gambar menggunakan URL pada MVP; upload file Multer belum diaktifkan.
+- Gunakan HTTPS dan secret kuat pada deployment produksi.
