@@ -24,6 +24,9 @@ function buildFilters(filters) {
     where.push("d.district LIKE ?");
     values.push(`%${filters.district}%`);
   }
+  if (filters.minPrice !== null || filters.maxPrice !== null) {
+    where.push("(d.price_min IS NOT NULL OR d.price_max IS NOT NULL)");
+  }
   if (filters.minPrice !== null) {
     where.push("(d.price_max IS NULL OR d.price_max >= ?)");
     values.push(filters.minPrice);
