@@ -49,9 +49,11 @@ export async function store(req, res, next) {
     if (categoryName.length < 2 || categoryName.length > 80) {
       return res.status(400).json({ success: false, message: "Nama kategori wajib diisi (2–80 karakter)." });
     }
+    const slug = slugify(req.body.slug || categoryName);
+    if (!slug) return res.status(400).json({ success: false, message: "Slug kategori tidak valid." });
     const data = await categories.createCategory({
       categoryName,
-      slug: slugify(req.body.slug || categoryName),
+      slug,
       description: String(req.body.description || "").trim()
     });
     return res.status(201).json({ success: true, data });
@@ -67,9 +69,11 @@ export async function update(req, res, next) {
     }
     const existing = await categories.getCategoryById(id);
     if (!existing) return res.status(404).json({ success: false, message: "Kategori tidak ditemukan." });
+    const slug = slugify(req.body.slug || categoryName);
+    if (!slug) return res.status(400).json({ success: false, message: "Slug kategori tidak valid." });
     const data = await categories.updateCategory(id, {
       categoryName,
-      slug: slugify(req.body.slug || categoryName),
+      slug,
       description: String(req.body.description || "").trim()
     });
     return res.json({ success: true, data });
