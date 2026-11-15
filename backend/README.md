@@ -16,10 +16,17 @@ npm install
 Salin `.env.example` menjadi `.env`, kemudian isi kredensial MySQL dan JWT secret acak minimal 32 karakter. Jangan commit file `.env`.
 
 ## Siapkan database baru
-Dari root repository:
+Jalankan dari root repository:
 
 ```bash
 mysql -u root -p < backend/database/schema.sql
+mysql -u root -p tripin_db < backend/database/seeds/initial_data.sql
+```
+
+Jika database lokal sebelumnya sudah dibuat dari schema awal TRIPIN yang memakai tabel `places` dan kolom `categories.name`, jalankan setelah schema baru:
+
+```bash
+mysql -u root -p tripin_db < backend/database/migrations/001_upgrade_preliminary_schema.sql
 mysql -u root -p tripin_db < backend/database/seeds/initial_data.sql
 ```
 
@@ -31,6 +38,8 @@ Isi `ADMIN_NAME`, `ADMIN_EMAIL`, dan `ADMIN_PASSWORD` (minimal 12 karakter) pada
 ```bash
 npm run create-admin
 ```
+
+Perintah ini membuat akun admin baru, atau memberikan role admin pada email yang sudah ada.
 
 ## Jalankan API
 ```bash
@@ -53,16 +62,19 @@ API tersedia pada `http://localhost:5000`.
 | GET | `/api/categories/:id/destinations` | Publik |
 | POST / PUT / DELETE | `/api/categories/:id` | Admin |
 | GET | `/api/reviews/:destinationId` | Publik |
+| GET | `/api/reviews/mine` | Login |
 | POST / PUT / DELETE | `/api/reviews` | Login (admin dapat moderasi) |
 | GET / POST / DELETE | `/api/favorites` | Login |
 | GET | `/api/admin/stats` | Admin |
+| GET | `/api/admin/destinations` | Admin |
+| GET / DELETE | `/api/admin/reviews` | Admin |
 
-Parameter daftar destinasi: `search`, `category_id`, `district`, `min_price`, `max_price`, `sort` (`newest`, `rating`, `popular`, `name`), `page`, dan `limit`.
+Daftar destinasi menerima query `search`, `category_id`, `district`, `min_price`, `max_price`, `sort` (`newest`, `rating`, `popular`, `name`), `page`, dan `limit`.
 
 Rating adalah rata-rata dari ulasan pengguna. Setiap pengguna hanya dapat memberi satu ulasan per destinasi. Pendaftaran publik hanya menghasilkan role `user`.
 
 ## Keamanan dan batasan MVP
-- Endpoint CRUD destinasi/kategori dan statistik admin dilindungi role admin.
+- Endpoint CRUD destinasi/kategori dan dashboard admin dilindungi role admin.
 - Password disimpan dengan bcrypt; token diverifikasi melalui JWT.
 - API memakai Helmet, CORS allowlist, dan rate limit login/register.
 - Gambar menggunakan URL pada MVP; upload file Multer belum diaktifkan.
