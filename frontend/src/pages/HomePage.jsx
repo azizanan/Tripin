@@ -12,6 +12,7 @@ const categoryIcons = [Coffee, Trees, Utensils, Hotel, Landmark, Gem, BriefcaseB
 export default function HomePage() {
   const [categories, setCategories] = useState([]);
   const [destinations, setDestinations] = useState([]);
+  const [latestDestinations, setLatestDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
@@ -20,11 +21,13 @@ export default function HomePage() {
     let active = true;
     Promise.all([
       api.get("/categories"),
-      api.get("/destinations", { params: { limit: 6, sort: "rating" } })
-    ]).then(([categoryResponse, destinationResponse]) => {
+      api.get("/destinations", { params: { limit: 6, sort: "rating" } }),
+      api.get("/destinations", { params: { limit: 3, sort: "newest" } })
+    ]).then(([categoryResponse, destinationResponse, latestResponse]) => {
       if (!active) return;
       setCategories(categoryResponse.data.data || []);
       setDestinations(destinationResponse.data.data || []);
+      setLatestDestinations(latestResponse.data.data || []);
     }).catch(() => {
       if (active) toast.error("Data TRIPIN belum dapat dimuat. Pastikan backend dan database aktif.");
     }).finally(() => active && setLoading(false));
@@ -106,6 +109,16 @@ export default function HomePage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{destinations.map((destination) => <DestinationCard key={destination.id} destination={destination} />)}</div>
           ) : <EmptyState title="Destinasi sedang disiapkan" description="Tempat yang dikirimkan ke TRIPIN akan tampil setelah informasi dasarnya diverifikasi dan dipublikasikan." />}
         </div>
+      </section>
+
+      <section className="page-container py-20">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div><span className="eyebrow">BARU DITAMBAHKAN</span><h2 className="heading-lg mt-3 text-slate-900">Destinasi terbaru</h2><p className="mt-2 text-sm text-slate-500">Tempat yang baru dipublikasikan dan siap kamu jelajahi.</p></div>
+          <Link to="/explore?sort=newest" className="inline-flex items-center gap-2 text-sm font-bold text-blue-600">Lihat semua <ArrowUpRight size={16} /></Link>
+        </div>
+        {loading ? <LoadingState /> : latestDestinations.length ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{latestDestinations.map((destination) => <DestinationCard key={destination.id} destination={destination} />)}</div>
+        ) : <EmptyState title="Belum ada destinasi terbaru" description="Destinasi terbaru akan tampil setelah diverifikasi dan dipublikasikan oleh admin." />}
       </section>
 
       <section className="page-container py-20">
