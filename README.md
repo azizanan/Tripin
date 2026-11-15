@@ -1,25 +1,26 @@
 # TRIPIN — Explore Surabaya
 
-TRIPIN adalah platform digital pariwisata yang membantu masyarakat lokal dan wisatawan menemukan rekomendasi tempat menarik di Kota Surabaya, mulai dari destinasi wisata, tempat bersejarah, kuliner, tempat nongkrong, coworking space, hingga penginapan.
+TRIPIN adalah platform discovery pariwisata untuk membantu masyarakat lokal dan wisatawan menemukan destinasi, kuliner, tempat nongkrong, penginapan, sejarah, coworking space, dan hidden gems di Surabaya.
 
-## Tech Stack
-- **Frontend:** React + Vite (JavaScript)
-- **Backend:** Node.js + Express
-- **Database:** MySQL
+## Technology Stack
+- Frontend: React + Vite + JavaScript + Tailwind CSS
+- Routing & HTTP: React Router DOM + Axios
+- UI utilities: Lucide React + React Hot Toast
+- Backend: Node.js + Express REST API
+- Authentication: JWT + bcrypt
+- Database: MySQL + mysql2
 
-## Struktur Repository
+## Struktur
 ```
 Tripin/
-├── frontend/       # Aplikasi React + Vite
-├── backend/
-│   ├── src/        # API, controller, model, routes, config
-│   └── database/   # Schema, migration, dan seed MySQL
-├── .gitignore
-└── README.md
+├── frontend/            # React client
+└── backend/
+    ├── src/             # REST API, controllers, models, middleware
+    └── database/        # MySQL schema, seeds, migrations
 ```
 
-## Menjalankan Project
-Lihat `frontend/README.md` dan `backend/README.md` untuk instruksi instalasi dan menjalankan aplikasi.
+## Setup
+Ikuti panduan `frontend/README.md` dan `backend/README.md`.
 
-## Catatan
-File konfigurasi rahasia disimpan di file `.env` lokal dan tidak boleh diunggah ke GitHub. Gunakan file `.env.example` sebagai panduan konfigurasi.
+## Data destinasi
+Data awal disimpan sebagai draft hingga alamat, harga, jam operasional, koordinat, dan foto diverifikasi. Hanya destinasi yang dipublikasikan admin muncul di API publik.
