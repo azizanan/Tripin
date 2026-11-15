@@ -46,7 +46,9 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
-app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth", authRoutes);
 app.use("/api/destinations", destinationRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/reviews", reviewRoutes);
