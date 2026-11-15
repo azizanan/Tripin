@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Compass, MapPin, Search, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BriefcaseBusiness, Compass, Coffee, Gem, Hotel, Landmark, MapPin, Search, Sparkles, Trees, Utensils } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -7,7 +7,7 @@ import DestinationCard from "../components/DestinationCard";
 import EmptyState from "../components/EmptyState";
 import LoadingState from "../components/LoadingState";
 
-const categoryIcons = ["Coffee", "Trees", "Utensils", "Hotel", "Landmark", "Gem", "BriefcaseBusiness"];
+const categoryIcons = [Coffee, Trees, Utensils, Hotel, Landmark, Gem, BriefcaseBusiness];
 
 export default function HomePage() {
   const [categories, setCategories] = useState([]);
@@ -85,8 +85,7 @@ export default function HomePage() {
         {loading ? <LoadingState label="Memuat kategori..." /> : categories.length === 0 ? <EmptyState title="Kategori belum tersedia" description="Kategori akan muncul setelah database diisi." /> : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
             {categories.map((category, index) => {
-              const IconNames = [Compass, Sparkles, Search, MapPin, LandmarkIcon, Sparkles, Compass];
-              const Icon = IconNames[index % IconNames.length];
+              const Icon = categoryIcons[index % categoryIcons.length];
               return <Link key={category.id} to={`/categories/${category.id}`} className="group rounded-2xl border border-slate-100 bg-white p-4 text-center transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-soft">
                 <span className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"><Icon size={21} /></span>
                 <span className="block text-xs font-extrabold leading-5 text-slate-800">{category.category_name}</span>
