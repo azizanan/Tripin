@@ -1,4 +1,4 @@
-import { Compass, Instagram, Mail, MapPin } from "lucide-react";
+import { Compass, Github, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
@@ -20,11 +20,10 @@ export default function Footer() {
           </div>
         </div>
         <div>
-          <h3 className="mb-4 font-bold text-white">Kontak</h3>
+          <h3 className="mb-4 font-bold text-white">Informasi</h3>
           <div className="flex flex-col gap-3 text-sm text-slate-400">
             <span className="flex items-center gap-2"><MapPin size={16} /> Surabaya, Jawa Timur</span>
-            <a href="mailto:hello@tripin.id" className="flex items-center gap-2 hover:text-white"><Mail size={16} /> hello@tripin.id</a>
-            <span className="flex items-center gap-2"><Instagram size={16} /> @tripin.surabaya</span>
+            <a href="https://github.com/azizanan/Tripin" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-white"><Github size={16} /> Repository project</a>
           </div>
         </div>
       </div>
