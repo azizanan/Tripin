@@ -23,11 +23,16 @@ function parseDestination(body) {
 
   return {
     data: {
-      categoryId, name, slug: slugify(body.slug || name),
+      categoryId,
+      name,
+      slug: slugify(body.slug || name),
       description: String(body.description || "").trim(),
       address: String(body.address || "").trim(),
       district: String(body.district || "").trim(),
-      latitude, longitude, priceMin, priceMax,
+      latitude,
+      longitude,
+      priceMin,
+      priceMax,
       openingHours: String(body.opening_hours || "").trim(),
       image: String(body.image || "").trim(),
       isPublished: body.is_published === true || body.is_published === 1 || body.is_published === "1"
@@ -41,18 +46,26 @@ export async function index(req, res, next) {
     const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 12, 1), 50);
     const minPrice = req.query.min_price === undefined ? null : Number(req.query.min_price);
     const maxPrice = req.query.max_price === undefined ? null : Number(req.query.max_price);
+    const categoryId = req.query.category_id === undefined ? null : Number(req.query.category_id);
+
     if ((minPrice !== null && (!Number.isFinite(minPrice) || minPrice < 0)) ||
-        (maxPrice !== null && (!Number.isFinite(maxPrice) || maxPrice < 0))) {
+        (maxPrice !== null && (!Number.isFinite(maxPrice) || maxPrice < 0)) ||
+        (minPrice !== null && maxPrice !== null && minPrice > maxPrice)) {
       return res.status(400).json({ success: false, message: "Rentang harga tidak valid." });
+    }
+    if (categoryId !== null && !isPositiveInteger(categoryId)) {
+      return res.status(400).json({ success: false, message: "Kategori tidak valid." });
     }
 
     const result = await listDestinations({
       search: String(req.query.search || "").trim().slice(0, 100),
-      categoryId: req.query.category_id ? Number(req.query.category_id) : null,
+      categoryId,
       district: String(req.query.district || "").trim().slice(0, 100),
-      minPrice, maxPrice,
+      minPrice,
+      maxPrice,
       sort: String(req.query.sort || "newest"),
-      limit, offset: (page - 1) * limit
+      limit,
+      offset: (page - 1) * limit
     });
 
     return res.json({
