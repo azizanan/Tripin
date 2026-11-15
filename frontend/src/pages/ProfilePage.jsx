@@ -29,6 +29,7 @@ export default function ProfilePage() {
     } finally { setLoading(false); }
   };
 
+  useEffect(() => { setName(user?.name || ""); }, [user]);
   useEffect(() => { loadData(); }, []);
 
   const saveProfile = async (event) => {
