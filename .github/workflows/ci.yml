@@ -70,3 +70,15 @@ jobs:
           DB_USER: root
           DB_PASSWORD: root
         run: node src/scripts/testDatabaseSchema.js
+      - name: Run REST API integration tests
+        working-directory: backend
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_NAME: tripin_db
+          JWT_SECRET: ci-only-secret-key-at-least-32-characters-long
+          JWT_EXPIRES_IN: 1h
+          FRONTEND_URL: http://localhost:5173
+        run: npm run test:integration
