@@ -11,14 +11,15 @@ TRIPIN adalah platform digital pariwisata yang membantu masyarakat lokal dan wis
 ```
 Tripin/
 ├── frontend/       # Aplikasi React + Vite
-├── backend/        # REST API Node.js + Express
-├── database/       # Schema dan seed database MySQL
+├── backend/
+│   ├── src/        # API, controller, model, routes, config
+│   └── database/   # Schema, migration, dan seed MySQL
 ├── .gitignore
 └── README.md
 ```
 
 ## Menjalankan Project
-Lihat README pada masing-masing folder untuk instruksi instalasi dan menjalankan frontend maupun backend.
+Lihat `frontend/README.md` dan `backend/README.md` untuk instruksi instalasi dan menjalankan aplikasi.
 
 ## Catatan
 File konfigurasi rahasia disimpan di file `.env` lokal dan tidak boleh diunggah ke GitHub. Gunakan file `.env.example` sebagai panduan konfigurasi.
