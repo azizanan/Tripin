@@ -4,43 +4,82 @@ CREATE DATABASE IF NOT EXISTS tripin_db
 
 USE tripin_db;
 
-CREATE TABLE IF NOT EXISTS categories (
-  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(80) NOT NULL,
-  slug VARCHAR(100) NOT NULL UNIQUE,
-  description VARCHAR(255) NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS users (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  profile_image TEXT NULL,
+  role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS places (
+CREATE TABLE IF NOT EXISTS categories (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  category_name VARCHAR(80) NOT NULL,
+  slug VARCHAR(100) NOT NULL UNIQUE,
+  description VARCHAR(255) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS destinations (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  category_id INT UNSIGNED NULL,
+  category_id INT UNSIGNED NOT NULL,
   name VARCHAR(160) NOT NULL,
   slug VARCHAR(180) NOT NULL UNIQUE,
   description TEXT NULL,
-  area VARCHAR(120) NULL,
   address VARCHAR(255) NULL,
-  image_url TEXT NULL,
+  district VARCHAR(120) NULL,
   latitude DECIMAL(10, 7) NULL,
   longitude DECIMAL(10, 7) NULL,
+  price_min DECIMAL(12, 2) NULL,
+  price_max DECIMAL(12, 2) NULL,
+  opening_hours VARCHAR(255) NULL,
+  image TEXT NULL,
   is_published BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_places_category
+  CONSTRAINT fk_destinations_category
     FOREIGN KEY (category_id) REFERENCES categories(id)
-    ON UPDATE CASCADE
-    ON DELETE SET NULL,
-  INDEX idx_places_category (category_id),
-  INDEX idx_places_published (is_published),
-  INDEX idx_places_name (name)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  INDEX idx_destinations_category (category_id),
+  INDEX idx_destinations_district (district),
+  INDEX idx_destinations_published (is_published),
+  INDEX idx_destinations_name (name)
 ) ENGINE=InnoDB;
 
-INSERT INTO categories (name, slug, description) VALUES
-  ('Wisata', 'wisata', 'Destinasi dan aktivitas wisata di Surabaya'),
-  ('Kuliner', 'kuliner', 'Tempat makan dan kuliner khas Surabaya'),
-  ('Nongkrong', 'nongkrong', 'Kafe, tempat berkumpul, dan coworking space'),
-  ('Sejarah', 'sejarah', 'Bangunan, museum, dan lokasi bersejarah'),
-  ('Penginapan', 'penginapan', 'Hotel, guest house, dan akomodasi')
-ON DUPLICATE KEY UPDATE
-  name = VALUES(name),
-  description = VALUES(description);
+CREATE TABLE IF NOT EXISTS reviews (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  destination_id BIGINT UNSIGNED NOT NULL,
+  rating TINYINT UNSIGNED NOT NULL,
+  comment TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT chk_reviews_rating CHECK (rating BETWEEN 1 AND 5),
+  CONSTRAINT fk_reviews_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_reviews_destination
+    FOREIGN KEY (destination_id) REFERENCES destinations(id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT uq_review_user_destination UNIQUE (user_id, destination_id),
+  INDEX idx_reviews_destination (destination_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS favorites (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  destination_id BIGINT UNSIGNED NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_favorites_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT fk_favorites_destination
+    FOREIGN KEY (destination_id) REFERENCES destinations(id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT uq_favorite_user_destination UNIQUE (user_id, destination_id),
+  INDEX idx_favorites_user (user_id)
+) ENGINE=InnoDB;
