@@ -10,12 +10,12 @@ const pool = mysql.createPool({
   connectionLimit: Number(process.env.DB_CONNECTION_LIMIT || 10),
   queueLimit: 0,
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0
+  keepAliveInitialDelay: 0,
+  decimalNumbers: true
 });
 
 export async function checkDatabaseConnection() {
   const connection = await pool.getConnection();
-
   try {
     await connection.ping();
     return true;
