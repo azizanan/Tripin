@@ -41,6 +41,17 @@ npm run create-admin
 
 Perintah ini membuat akun admin baru, atau memberikan role admin pada email yang sudah ada.
 
+## Pengujian otomatis
+
+Jalankan unit test validasi dan API integration test:
+
+```bash
+npm test
+npm run test:integration
+```
+
+Integration test memerlukan database MySQL yang sudah dibuat dan diisi seed, serta `JWT_SECRET` minimal 32 karakter. Test membuat akun dan data sementara dengan nama unik, lalu menghapusnya setelah selesai.
+
 ## Jalankan API
 ```bash
 npm run dev
