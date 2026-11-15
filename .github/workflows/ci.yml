@@ -36,6 +36,9 @@ jobs:
         run: |
           node --check server.js
           find src -type f -name "*.js" -print0 | xargs -0 -n1 node --check
+      - name: Run backend unit tests
+        working-directory: backend
+        run: npm test
 
   database-schema:
     runs-on: ubuntu-latest
